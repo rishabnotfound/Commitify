@@ -10,7 +10,7 @@ export async function GET() {
     );
   }
 
-  const scopes = ['repo', 'read:user', 'user:email'].join(' ');
+  const scopes = ['repo', 'delete_repo', 'read:user', 'user:email'].join(' ');
   const redirectUri = 'http://localhost:3000/api/callback';
 
   const authUrl = new URL('https://github.com/login/oauth/authorize');

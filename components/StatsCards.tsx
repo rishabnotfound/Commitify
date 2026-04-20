@@ -13,7 +13,6 @@ export function StatsCards({ weeks }: StatsCardsProps) {
   const totalContributions = allDays.reduce((sum, day) => sum + day.contributionCount, 0);
   const activeDays = allDays.filter((day) => day.contributionCount > 0).length;
 
-  // Calculate current streak
   const today = new Date().toISOString().split('T')[0];
   const sortedDays = [...allDays].sort((a, b) => b.date.localeCompare(a.date));
   let currentStreak = 0;
@@ -32,7 +31,6 @@ export function StatsCards({ weeks }: StatsCardsProps) {
     }
   }
 
-  // Calculate longest streak
   let longestStreak = 0;
   let tempStreak = 0;
   for (const day of allDays) {
@@ -47,36 +45,36 @@ export function StatsCards({ weeks }: StatsCardsProps) {
   const stats = [
     {
       icon: GitCommit,
-      label: 'Contributions',
+      label: 'Total',
       value: totalContributions.toLocaleString(),
       color: 'text-neon-green-400',
       bg: 'bg-neon-green-500/10',
     },
     {
       icon: Calendar,
-      label: 'Active Days',
+      label: 'Active',
       value: activeDays.toString(),
       color: 'text-blue-400',
       bg: 'bg-blue-500/10',
     },
     {
       icon: Flame,
-      label: 'Current Streak',
-      value: `${currentStreak}d`,
+      label: 'Streak',
+      value: `${currentStreak}`,
       color: 'text-orange-400',
       bg: 'bg-orange-500/10',
     },
     {
       icon: TrendingUp,
-      label: 'Best Streak',
-      value: `${longestStreak}d`,
+      label: 'Best',
+      value: `${longestStreak}`,
       color: 'text-purple-400',
       bg: 'bg-purple-500/10',
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid grid-cols-4 gap-2 sm:gap-3">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
@@ -84,17 +82,17 @@ export function StatsCards({ weeks }: StatsCardsProps) {
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-            whileHover={{ y: -2, transition: { duration: 0.2 } }}
-            className="liquid-glass rounded-xl p-4 group"
+            transition={{ duration: 0.4, delay: index * 0.05 }}
+            className="liquid-glass rounded-xl p-2.5 sm:p-4"
           >
-            <div className="flex items-center gap-2 mb-2">
-              <div className={`p-1.5 rounded-lg ${stat.bg} group-hover:scale-110 transition-transform`}>
-                <Icon className={`w-3.5 h-3.5 ${stat.color}`} />
+            <div className="flex items-center gap-1.5 mb-1 sm:mb-2">
+              <div className={`p-1 sm:p-1.5 rounded-lg ${stat.bg}`}>
+                <Icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${stat.color}`} />
               </div>
-              <span className="text-xs text-white/40">{stat.label}</span>
+              <span className="text-[10px] sm:text-xs text-white/40 hidden sm:inline">{stat.label}</span>
             </div>
-            <p className="text-2xl font-bold text-white">{stat.value}</p>
+            <p className="text-base sm:text-xl font-bold text-white">{stat.value}</p>
+            <p className="text-[10px] text-white/30 sm:hidden">{stat.label}</p>
           </motion.div>
         );
       })}

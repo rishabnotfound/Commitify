@@ -25,16 +25,12 @@ export function UserCard({ user }: UserCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="liquid-glass rounded-2xl p-6 light-beam"
+      className="liquid-glass rounded-2xl p-4 sm:p-6"
     >
-      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+      <div className="flex items-center gap-4">
         {/* Avatar */}
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="relative group"
-        >
-          <div className="absolute inset-0 bg-neon-green-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/10 group-hover:border-neon-green-500/30 transition-colors">
+        <div className="relative flex-shrink-0">
+          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border-2 border-white/10">
             <Image
               src={user.avatarUrl}
               alt={user.username}
@@ -42,41 +38,36 @@ export function UserCard({ user }: UserCardProps) {
               className="object-cover"
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Info */}
-        <div className="text-center sm:text-left flex-1">
-          <div className="flex items-center gap-3 justify-center sm:justify-start mb-1">
-            <h2 className="text-xl font-bold text-white">{user.username}</h2>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-lg sm:text-xl font-bold text-white truncate">{user.username}</h2>
             <a
               href={`https://github.com/${user.username}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/30 hover:text-neon-green-400 transition-colors"
+              className="text-white/30 hover:text-neon-green-400 transition-colors flex-shrink-0"
             >
-              <ExternalLink className="w-4 h-4" />
+              <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
-          {user.email && (
-            <p className="text-white/40 text-sm mb-3">{user.email}</p>
-          )}
 
-          <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-sm">
-            <div className="flex items-center gap-2 text-white/50">
-              <Calendar className="w-3.5 h-3.5 text-neon-green-400" />
-              <span>GitHub {formatDate(githubJoinDate)}</span>
-            </div>
-
-            <div className="flex items-center gap-2 text-white/50">
-              <Clock className="w-3.5 h-3.5 text-neon-green-400" />
-              <span>Joined {formatDate(platformJoinDate)}</span>
-            </div>
-
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs sm:text-sm text-white/50">
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-neon-green-400" />
+              {formatDate(githubJoinDate)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3 text-neon-green-400" />
+              Joined {formatDate(platformJoinDate)}
+            </span>
             {user.repoName && (
-              <div className="flex items-center gap-2 text-white/50">
-                <GitBranch className="w-3.5 h-3.5 text-neon-green-400" />
-                <span>{user.repoName}</span>
-              </div>
+              <span className="flex items-center gap-1">
+                <GitBranch className="w-3 h-3 text-neon-green-400" />
+                {user.repoName}
+              </span>
             )}
           </div>
         </div>

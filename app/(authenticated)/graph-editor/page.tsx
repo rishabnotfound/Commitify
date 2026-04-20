@@ -31,13 +31,11 @@ export default function GraphEditorPage() {
   }, [fetchContributions]);
 
   const handleCommitsGenerated = () => {
-    setTimeout(() => {
-      fetchContributions();
-    }, 3000);
+    setTimeout(() => fetchContributions(), 3000);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -45,20 +43,20 @@ export default function GraphEditorPage() {
         className="flex items-center justify-between"
       >
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white">Graph Editor</h1>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-green-500/10 border border-neon-green-500/20">
-              <Wand2 className="w-3 h-3 text-neon-green-400" />
-              <span className="text-xs text-neon-green-400 font-medium">Interactive</span>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Graph Editor</h1>
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neon-green-500/10 border border-neon-green-500/20">
+              <Wand2 className="w-2.5 h-2.5 text-neon-green-400" />
+              <span className="text-[10px] text-neon-green-400 font-medium">Interactive</span>
             </div>
           </div>
-          <p className="text-white/40 text-sm mt-1">Click dates to add commits • Navigate years freely</p>
+          <p className="text-white/40 text-xs sm:text-sm mt-0.5">Tap dates to add commits</p>
         </div>
 
         <button
           onClick={fetchContributions}
           disabled={isLoading}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl liquid-glass text-white/50 hover:text-white transition-colors disabled:opacity-50 text-sm"
+          className="p-2 rounded-xl liquid-glass text-white/50 hover:text-white transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
         </button>
@@ -69,7 +67,7 @@ export default function GraphEditorPage() {
         <ContributionGraphSkeleton />
       ) : (
         <GraphEditor
-          weeks={contributions}
+          initialWeeks={contributions}
           onCommitsGenerated={handleCommitsGenerated}
         />
       )}

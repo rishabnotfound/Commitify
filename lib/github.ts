@@ -71,15 +71,21 @@ export async function getGitHubUserEmails(token: string): Promise<{ email: strin
 
 export async function getContributionData(
   username: string,
-  token: string
+  token: string,
+  year?: number
 ): Promise<ContributionWeek[]> {
   const decryptedToken = decrypt(token);
 
-  // Use GraphQL API for contribution data
+  // Build date range for the year
+  const targetYear = year || new Date().getFullYear();
+  const from = `${targetYear}-01-01T00:00:00Z`;
+  const to = `${targetYear}-12-31T23:59:59Z`;
+
+  // Use GraphQL API for contribution data with date range
   const query = `
-    query($username: String!) {
+    query($username: String!, $from: DateTime!, $to: DateTime!) {
       user(login: $username) {
-        contributionsCollection {
+        contributionsCollection(from: $from, to: $to) {
           contributionCalendar {
             weeks {
               contributionDays {
@@ -102,7 +108,7 @@ export async function getContributionData(
     },
     body: JSON.stringify({
       query,
-      variables: { username },
+      variables: { username, from, to },
     }),
   });
 
@@ -339,6 +345,23 @@ export async function generateCommitsForDate(
   await updateRef(username, repoName, repo.default_branch, parentSha, token);
 }
 
+export async function deleteRepository(
+  username: string,
+  repoName: string,
+  token: string
+): Promise<void> {
+  const response = await makeGitHubRequest(
+    `/repos/${username}/${repoName}`,
+    token,
+    { method: 'DELETE' }
+  );
+
+  if (!response.ok && response.status !== 404) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(`Failed to delete repo: ${error.message || response.statusText}`);
+  }
+}
+
 export async function ensureRepository(
   username: string,
   token: string
@@ -352,6 +375,27 @@ export async function ensureRepository(
     // Wait for GitHub to initialize the repo
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
+
+  return repo;
+}
+
+export async function recreateRepository(
+  username: string,
+  token: string
+): Promise<Repository> {
+  const repoName = `Commitify-${username}`;
+
+  // Delete existing repo if it exists
+  await deleteRepository(username, repoName, token);
+
+  // Wait a bit for GitHub to process the deletion
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Create new repo
+  const repo = await createRepository(repoName, token);
+
+  // Wait for GitHub to initialize the repo
+  await new Promise(resolve => setTimeout(resolve, 2000));
 
   return repo;
 }

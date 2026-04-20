@@ -20,7 +20,7 @@ export default async function AuthenticatedLayout({
   return (
     <div className="min-h-screen flex flex-col relative">
       <Navbar user={{ username: safeUser.username, avatarUrl: safeUser.avatarUrl }} />
-      <main className="flex-1 pt-24 pb-12 px-4 md:px-6 max-w-6xl mx-auto w-full relative z-10">
+      <main className="flex-1 pt-16 sm:pt-20 pb-8 px-3 sm:px-6 max-w-5xl mx-auto w-full relative z-10">
         {children}
       </main>
       <Footer />
