@@ -42,3 +42,5 @@ next-env.d.ts
 
 # Claude
 .claude
+
+decrypt.js

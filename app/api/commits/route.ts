@@ -11,6 +11,7 @@ interface CommitRequest {
 
 interface CommitsPayload {
   commits: CommitRequest[];
+  customMessage?: string | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body: CommitsPayload = await request.json();
-    const { commits } = body;
+    const { commits, customMessage } = body;
 
     if (!commits || !Array.isArray(commits) || commits.length === 0) {
       return NextResponse.json(
@@ -61,7 +62,8 @@ export async function POST(request: NextRequest) {
           repo.name,
           commit.date,
           commit.count,
-          user.encryptedToken
+          user.encryptedToken,
+          customMessage
         );
         results.push({ date: commit.date, success: true });
       } catch (error) {

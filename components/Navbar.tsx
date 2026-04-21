@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { GitBranch, LayoutDashboard, Grid3X3, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Grid3X3, Settings, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -35,16 +35,20 @@ export function Navbar({ user }: NavbarProps) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-3 left-3 right-3 sm:left-1/2 sm:right-auto sm:top-4 sm:-translate-x-1/2 sm:w-auto z-50"
+      className="fixed top-2 left-3 right-3 sm:left-1/2 sm:right-auto sm:top-4 sm:-translate-x-1/2 sm:w-auto z-50"
     >
       <div className="liquid-glass rounded-2xl px-2 py-1.5 flex items-center justify-between sm:justify-start gap-1">
-        {/* Logo - hidden on mobile, show on sm+ */}
         <Link
           href="/dashboard"
           className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5 transition-all"
         >
-          <GitBranch className="w-4 h-4 text-neon-green-400" />
-          <span className="font-semibold text-white/90 text-sm">Commitify</span>
+          <Image
+            src="/banner.png"
+            alt="Commitify"
+            width={500}
+            height={500}
+            className="w-20 h-7"
+          />
         </Link>
 
         {/* Divider - hidden on mobile */}

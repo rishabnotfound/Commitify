@@ -306,7 +306,8 @@ export async function generateCommitsForDate(
   repoName: string,
   date: string,
   count: number,
-  token: string
+  token: string,
+  customMessage?: string | null
 ): Promise<void> {
   // Get the latest commit to use as parent
   const repo = await checkRepoExists(username, repoName, token);
@@ -328,10 +329,23 @@ export async function generateCommitsForDate(
     const minute = Math.floor(Math.random() * 60);
     const commitDate = `${date}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00Z`;
 
+    // Build commit message with placeholder replacement
+    let message = customMessage || 'Commitify: {username} Contribution {date}';
+    message = message
+      .replace(/\{username\}/gi, username)
+      .replace(/\{date\}/gi, date);
+
+    // If message has no placeholders and count > 1, add index
+    if (count > 1 && !customMessage) {
+      message = `Commitify: ${username} Contribution ${date} #${i + 1}`;
+    } else if (count > 1) {
+      message = `${message} #${i + 1}`;
+    }
+
     const commit = await createCommit(
       username,
       repoName,
-      `Commitify: Contribution ${i + 1}`,
+      message,
       commitDate,
       parentSha,
       treeSha,

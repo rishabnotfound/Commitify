@@ -110,6 +110,8 @@ export async function GET(request: NextRequest) {
       userData.createdAt = now;
       userData.repoName = null;
       userData.lastCommitDate = null;
+      userData.termsAccepted = false;
+      userData.termsAcceptedAt = null;
     }
 
     await usersCollection.updateOne(

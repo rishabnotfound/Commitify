@@ -11,6 +11,8 @@ export interface User {
   email: string | null;
   repoName: string | null;
   lastCommitDate: Date | null;
+  termsAccepted: boolean;
+  termsAcceptedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +27,7 @@ export interface SafeUser {
   email: string | null;
   repoName: string | null;
   lastCommitDate: string | null;
+  termsAccepted: boolean;
 }
 
 export function toSafeUser(user: User): SafeUser {
@@ -38,5 +41,6 @@ export function toSafeUser(user: User): SafeUser {
     email: user.email,
     repoName: user.repoName,
     lastCommitDate: user.lastCommitDate?.toISOString() || null,
+    termsAccepted: user.termsAccepted || false,
   };
 }

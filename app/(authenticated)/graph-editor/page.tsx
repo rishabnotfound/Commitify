@@ -10,7 +10,32 @@ import type { ContributionWeek } from '@/components/ContributionGraph';
 
 export default function GraphEditorPage() {
   const [contributions, setContributions] = useState<ContributionWeek[] | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const [contribRes, userRes] = await Promise.all([
+        fetch('/api/contributions'),
+        fetch('/api/user')
+      ]);
+
+      if (!contribRes.ok) throw new Error('Failed to fetch contributions');
+
+      const contribData = await contribRes.json();
+      setContributions(contribData.contributions);
+
+      if (userRes.ok) {
+        const userData = await userRes.json();
+        setTermsAccepted(userData.user?.termsAccepted || false);
+      }
+    } catch (error) {
+      toast.error('Failed to load data');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const fetchContributions = useCallback(async () => {
     try {
@@ -21,14 +46,12 @@ export default function GraphEditorPage() {
     } catch (error) {
       toast.error('Failed to load contributions');
       console.error(error);
-    } finally {
-      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchContributions();
-  }, [fetchContributions]);
+    fetchData();
+  }, [fetchData]);
 
   const handleCommitsGenerated = () => {
     setTimeout(() => fetchContributions(), 3000);
@@ -68,6 +91,7 @@ export default function GraphEditorPage() {
       ) : (
         <GraphEditor
           initialWeeks={contributions}
+          termsAccepted={termsAccepted}
           onCommitsGenerated={handleCommitsGenerated}
         />
       )}

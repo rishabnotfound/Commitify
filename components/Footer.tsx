@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { GitBranch, Github, Heart } from 'lucide-react';
+import { Github, Heart } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export function Footer() {
@@ -16,9 +17,14 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Brand */}
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 group">
-              <GitBranch className="w-4 h-4 text-neon-green-400" />
-              <span className="font-medium text-white/70 text-sm">Commitify</span>
+            <Link href="/" className="group">
+              <Image
+                src="/banner.png"
+                alt="Commitify"
+                width={120}
+                height={32}
+                className="h-6 w-auto opacity-70 group-hover:opacity-100 transition-opacity"
+              />
             </Link>
             <a
               href="https://github.com/rishabnotfound/Commitify"
@@ -32,6 +38,10 @@ export function Footer() {
 
           {/* Copyright & Made with */}
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-xs text-white/30">
+            <Link href="/terms" className="hover:text-white/50 transition-colors">
+              Terms
+            </Link>
+            <span className="hidden sm:inline text-white/10">•</span>
             <span>© {new Date().getFullYear()} Commitify</span>
             <span className="hidden sm:inline text-white/10">•</span>
             <span className="flex items-center gap-1">

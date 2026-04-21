@@ -73,8 +73,12 @@ export function StatsCards({ weeks }: StatsCardsProps) {
     },
   ];
 
+  const currentYear = new Date().getFullYear();
+
   return (
-    <div className="grid grid-cols-4 gap-2 sm:gap-3">
+    <div className="space-y-3">
+      <h3 className="text-sm text-white/40 font-medium">{currentYear} Statistics</h3>
+      <div className="grid grid-cols-4 gap-2 sm:gap-3">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
@@ -96,6 +100,7 @@ export function StatsCards({ weeks }: StatsCardsProps) {
           </motion.div>
         );
       })}
+      </div>
     </div>
   );
 }
