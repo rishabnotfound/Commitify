@@ -8,7 +8,7 @@
 
 Instantly design and automate GitHub contribution graphs with smart commit scheduling
 
-### Preview
+## Preview
 
 <img width="2926" height="1674" alt="image" src="https://github.com/user-attachments/assets/f836365f-f27d-4195-b20f-72a655541b38" />
 <br><br>
