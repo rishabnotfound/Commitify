@@ -8,6 +8,12 @@
 
 Instantly design and automate GitHub contribution graphs with smart commit scheduling
 
+## Live Proof
+
+[SEE IT YOURSELF](https://github.com/rishabnotfound?tab=overview&from=2007-12-01&to=2007-12-31)
+
+![alt text](./public/proof.png)
+
 ## Development
 
 ```bash

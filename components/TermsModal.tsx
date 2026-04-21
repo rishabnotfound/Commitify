@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, ExternalLink, X } from 'lucide-react';
+import { ExternalLink, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface TermsModalProps {
