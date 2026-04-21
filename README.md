@@ -11,6 +11,7 @@ Instantly design and automate GitHub contribution graphs with smart commit sched
 ### Preview
 
 <img width="2926" height="1674" alt="image" src="https://github.com/user-attachments/assets/f836365f-f27d-4195-b20f-72a655541b38" />
+<br><br>
 <img width="2938" height="1682" alt="image" src="https://github.com/user-attachments/assets/83d2c96d-7d64-4c6c-b1a0-b8ba57fde34c" />
 
 ## Live Proof
