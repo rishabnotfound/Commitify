@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   const scopes = ['repo', 'delete_repo', 'read:user', 'user:email'].join(' ');
-  const redirectUri = 'http://localhost:3000/api/callback';
+  const redirectUri = process.env.REDIRECT_URI;
 
   const authUrl = new URL('https://github.com/login/oauth/authorize');
   authUrl.searchParams.set('client_id', clientId);
