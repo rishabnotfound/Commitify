@@ -34,12 +34,69 @@ const levelColors = {
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const days = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
+// Normalize weeks to ensure proper padding at start and end of year
+function normalizeWeeks(weeks: ContributionWeek[], year: number): ContributionWeek[] {
+  if (!weeks.length) return weeks;
+
+  const result = [...weeks.map(w => ({ contributionDays: [...w.contributionDays] }))];
+
+  // Check first week - pad with empty days before Jan 1
+  const firstWeek = result[0];
+  if (firstWeek && firstWeek.contributionDays.length > 0) {
+    const firstDay = firstWeek.contributionDays[0];
+    const firstDate = new Date(firstDay.date);
+
+    // If first day is Jan 1 of target year, we need to add padding
+    if (firstDate.getMonth() === 0 && firstDate.getDate() === 1 && firstDate.getFullYear() === year) {
+      const dayOfWeek = firstDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+      // Add empty days before Jan 1
+      const paddingDays: ContributionDay[] = [];
+      for (let i = 0; i < dayOfWeek; i++) {
+        const paddingDate = new Date(year - 1, 11, 31 - (dayOfWeek - 1 - i)); // Dec dates from prev year
+        paddingDays.push({
+          date: paddingDate.toISOString().split('T')[0],
+          contributionCount: 0,
+          contributionLevel: 'NONE'
+        });
+      }
+      firstWeek.contributionDays = [...paddingDays, ...firstWeek.contributionDays];
+    }
+  }
+
+  // Check last week - pad with empty days after Dec 31
+  const lastWeek = result[result.length - 1];
+  if (lastWeek && lastWeek.contributionDays.length < 7) {
+    const lastDay = lastWeek.contributionDays[lastWeek.contributionDays.length - 1];
+    const lastDate = new Date(lastDay.date);
+
+    // If last day is Dec 31 of target year, pad to complete the week
+    if (lastDate.getMonth() === 11 && lastDate.getDate() === 31 && lastDate.getFullYear() === year) {
+      const remaining = 7 - lastWeek.contributionDays.length;
+      for (let i = 1; i <= remaining; i++) {
+        const paddingDate = new Date(year + 1, 0, i); // Jan dates of next year
+        lastWeek.contributionDays.push({
+          date: paddingDate.toISOString().split('T')[0],
+          contributionCount: 0,
+          contributionLevel: 'NONE'
+        });
+      }
+    }
+  }
+
+  return result;
+}
+
 export function ContributionGraph({ weeks, interactive = false, selectedDates, onDateClick, onDateHover, year }: ContributionGraphProps) {
   const displayYear = year || new Date().getFullYear();
+
+  // Normalize weeks - ensure first week has proper padding for days before Jan 1
+  const normalizedWeeks = normalizeWeeks(weeks, displayYear);
+
   const monthLabels: { month: string; weekIndex: number }[] = [];
   let lastMonth = -1;
 
-  weeks.forEach((week, weekIndex) => {
+  normalizedWeeks.forEach((week, weekIndex) => {
     // Find first day that's actually in the target year
     const firstDayInYear = week.contributionDays.find(d => d.date.startsWith(displayYear.toString()));
     if (firstDayInYear) {
@@ -87,7 +144,7 @@ export function ContributionGraph({ weeks, interactive = false, selectedDates, o
 
         {/* Weeks */}
         <div className="flex" style={{ gap }}>
-          {weeks.map((week, weekIndex) => (
+          {normalizedWeeks.map((week, weekIndex) => (
             <div key={weekIndex} className="flex flex-col" style={{ gap }}>
               {week.contributionDays.map((day) => {
                 const isSelected = selectedDates?.has(day.date);
