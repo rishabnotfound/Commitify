@@ -34,7 +34,7 @@ const levelColors = {
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const days = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
-// Normalize weeks to ensure proper padding at start and end of year
+// Normalize weeks to ensure proper padding at start of year
 function normalizeWeeks(weeks: ContributionWeek[], year: number): ContributionWeek[] {
   if (!weeks.length) return weeks;
 
@@ -61,26 +61,6 @@ function normalizeWeeks(weeks: ContributionWeek[], year: number): ContributionWe
         });
       }
       firstWeek.contributionDays = [...paddingDays, ...firstWeek.contributionDays];
-    }
-  }
-
-  // Check last week - pad with empty days after Dec 31
-  const lastWeek = result[result.length - 1];
-  if (lastWeek && lastWeek.contributionDays.length < 7) {
-    const lastDay = lastWeek.contributionDays[lastWeek.contributionDays.length - 1];
-    const lastDate = new Date(lastDay.date);
-
-    // If last day is Dec 31 of target year, pad to complete the week
-    if (lastDate.getMonth() === 11 && lastDate.getDate() === 31 && lastDate.getFullYear() === year) {
-      const remaining = 7 - lastWeek.contributionDays.length;
-      for (let i = 1; i <= remaining; i++) {
-        const paddingDate = new Date(year + 1, 0, i); // Jan dates of next year
-        lastWeek.contributionDays.push({
-          date: paddingDate.toISOString().split('T')[0],
-          contributionCount: 0,
-          contributionLevel: 'NONE'
-        });
-      }
     }
   }
 
