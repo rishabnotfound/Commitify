@@ -1,11 +1,6 @@
 import { MongoClient, Db } from 'mongodb';
 
-const MONGODB_URI = process.env.MONGODB_URI!;
-const DB_NAME = 'Commitify';
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable');
-}
+const DB_NAME = 'commitify';
 
 interface MongoConnection {
   client: MongoClient;
@@ -17,6 +12,11 @@ let cached: MongoConnection | null = null;
 export async function connectToDatabase(): Promise<MongoConnection> {
   if (cached) {
     return cached;
+  }
+
+  const MONGODB_URI = process.env.MONGODB_URI;
+  if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable');
   }
 
   const client = await MongoClient.connect(MONGODB_URI);

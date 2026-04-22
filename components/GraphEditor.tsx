@@ -40,8 +40,6 @@ export function GraphEditor({ initialWeeks, termsAccepted: initialTermsAccepted 
   const [termsAccepted, setTermsAccepted] = useState(initialTermsAccepted);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [isAcceptingTerms, setIsAcceptingTerms] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, total: 0, currentDate: '' });
-  const [startTime, setStartTime] = useState<number | null>(null);
 
   const fetchYearContributions = useCallback(async (year: number) => {
     if (year === currentYear) {
@@ -108,47 +106,26 @@ export function GraphEditor({ initialWeeks, termsAccepted: initialTermsAccepted 
   };
 
   const generateCommits = async () => {
-    const commits = Array.from(selectedDates.entries()).map(([date, count]) => ({ date, count }));
-    const total = commits.length;
-
     setIsSubmitting(true);
-    setProgress({ current: 0, total, currentDate: '' });
-    setStartTime(Date.now());
-
-    let successCount = 0;
-    let failCount = 0;
-
-    for (let i = 0; i < commits.length; i++) {
-      const commit = commits[i];
-      setProgress({ current: i, total, currentDate: commit.date });
-
-      try {
-        const response = await fetch('/api/commits', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            commits: [commit],
-            customMessage: customMsg || null
-          }),
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        successCount++;
-      } catch {
-        failCount++;
-      }
-    }
-
-    setProgress({ current: total, total, currentDate: '' });
-    setIsSubmitting(false);
-    setStartTime(null);
-
-    if (successCount > 0) {
-      toast.success(`Generated commits for ${successCount} dates${failCount > 0 ? `, ${failCount} failed` : ''}`);
+    try {
+      const commits = Array.from(selectedDates.entries()).map(([date, count]) => ({ date, count }));
+      const response = await fetch('/api/commits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          commits,
+          customMessage: customMsg || null
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      toast.success(data.message);
       setSelectedDates(new Map());
       onCommitsGenerated?.();
-    } else {
-      toast.error('Failed to generate commits');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -168,20 +145,6 @@ export function GraphEditor({ initialWeeks, termsAccepted: initialTermsAccepted 
   const canGoBack = selectedYear > minYear;
   const canGoForward = selectedYear < currentYear;
 
-  // Calculate estimated time remaining
-  const getEstimatedTime = () => {
-    if (!startTime || progress.current === 0) return null;
-    const elapsed = Date.now() - startTime;
-    const avgTimePerDate = elapsed / progress.current;
-    const remaining = (progress.total - progress.current) * avgTimePerDate;
-    const seconds = Math.ceil(remaining / 1000);
-    if (seconds < 60) return `~${seconds}s remaining`;
-    const minutes = Math.ceil(seconds / 60);
-    return `~${minutes}m remaining`;
-  };
-
-  const progressPercent = progress.total > 0 ? (progress.current / progress.total) * 100 : 0;
-
   return (
     <div className="space-y-4">
       {/* Submitting overlay */}
@@ -191,55 +154,15 @@ export function GraphEditor({ initialWeeks, termsAccepted: initialTermsAccepted 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           >
-            <div className="liquid-glass rounded-2xl p-6 w-full max-w-sm">
-              {/* Header */}
-              <div className="flex items-center gap-3 mb-6">
-                <Loader2 className="w-6 h-6 text-neon-green-400 animate-spin" />
-                <div>
-                  <p className="text-white font-medium">Generating commits</p>
-                  <p className="text-white/40 text-xs">Don&apos;t close this tab</p>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="mb-4">
-                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progressPercent}%` }}
-                    transition={{ duration: 0.3 }}
-                    className="h-full bg-neon-green-500 rounded-full"
-                  />
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="flex items-center justify-between text-sm mb-4">
-                <span className="text-white/60">
-                  {progress.current} of {progress.total} dates
-                </span>
-                <span className="text-neon-green-400 font-mono">
-                  {Math.round(progressPercent)}%
-                </span>
-              </div>
-
-              {/* Current date & ETA */}
-              <div className="space-y-2 text-xs">
-                {progress.currentDate && (
-                  <div className="flex items-center justify-between text-white/40">
-                    <span>Processing</span>
-                    <span className="font-mono text-white/60">{progress.currentDate}</span>
-                  </div>
-                )}
-                {getEstimatedTime() && (
-                  <div className="flex items-center justify-between text-white/40">
-                    <span>Estimated</span>
-                    <span className="text-white/60">{getEstimatedTime()}</span>
-                  </div>
-                )}
-              </div>
+            <div className="liquid-glass rounded-2xl p-6 text-center max-w-xs">
+              <Loader2 className="w-10 h-10 text-neon-green-400 animate-spin mx-auto mb-4" />
+              <p className="text-white font-medium mb-2">Generating {totalCommits} commits...</p>
+              <p className="text-white/40 text-xs flex items-center justify-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                Don&apos;t close this tab
+              </p>
             </div>
           </motion.div>
         )}

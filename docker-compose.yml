@@ -1,0 +1,31 @@
+services:
+  app:
+    build: .
+    ports:
+      - "80:3000"
+    environment:
+      - MONGODB_URI=mongodb://${MONGO_USER:-commitify}:${MONGO_PASS:-commitify123}@mongo:27017/commitify?authSource=admin
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:4.4
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-commitify}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS:-commitify123}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "-u", "${MONGO_USER:-commitify}", "-p", "${MONGO_PASS:-commitify123}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mongo_data:

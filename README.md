@@ -20,13 +20,55 @@
 
 ## How It Works
 
+```
+                                    ┌─────────────────────────────────────────────────────────────┐
+                                    │                        COMMITIFY                            │
+                                    └─────────────────────────────────────────────────────────────┘
+                                                               │
+                 ┌─────────────────────────────────────────────┼─────────────────────────────────────────────┐
+                 │                                             │                                             │
+                 ▼                                             ▼                                             ▼
+    ┌───────────────────────┐                     ┌───────────────────────┐                     ┌───────────────────────┐
+    │                       │                     │                       │                     │                       │
+    │    🔐 GitHub OAuth    │                     │    📅 Graph Editor    │                     │    💾 MongoDB         │
+    │                       │                     │                       │                     │                       │
+    │  • Secure login       │                     │  • Visual calendar    │                     │  • Encrypted tokens   │
+    │  • Token exchange     │                     │  • Click to select    │                     │  • User preferences   │
+    │  • Permissions        │                     │  • Year navigation    │                     │  • Session data       │
+    │                       │                     │                       │                     │                       │
+    └───────────┬───────────┘                     └───────────┬───────────┘                     └───────────────────────┘
+                │                                             │
+                │                                             │
+                ▼                                             ▼
+    ┌───────────────────────┐                     ┌───────────────────────┐
+    │                       │                     │                       │
+    │    👤 User Session    │                     │    ⚡ GitHub API      │
+    │                       │────────────────────▶│                       │
+    │  • Authenticated      │                     │  • Create repository  │
+    │  • Access granted     │                     │  • Backdate commits   │
+    │                       │                     │  • Push changes       │
+    └───────────────────────┘                     │                       │
+                                                  └───────────┬───────────┘
+                                                              │
+                                                              ▼
+                                                  ┌───────────────────────┐
+                                                  │                       │
+                                                  │  ✅ Profile Updated   │
+                                                  │                       │
+                                                  │  • Commits visible    │
+                                                  │  • Graph painted      │
+                                                  │  • Instant results    │
+                                                  │                       │
+                                                  └───────────────────────┘
+```
+
 1. **Sign in** — Connect your GitHub account via OAuth
 2. **Pick dates** — Click on the contribution graph to select dates
 3. **Set commits** — Choose how many commits per date (1-15)
 4. **Generate** — We create real commits with backdated timestamps
 5. **Done** — Your GitHub profile updates within minutes
 
-All commits go to a private repository named `Commitify-{username}`. You can delete it anytime from Settings.
+All commits go to a repository named `Commitify-{username}`. You can delete it anytime from Settings.
 
 ## Tech Stack
 
@@ -51,32 +93,39 @@ All commits go to a private repository named `Commitify-{username}`. You can del
 
 ## Self Hosting
 
+### Docker (Recommended)
+
 ```bash
 # Clone
 git clone https://github.com/rishabnotfound/Commitify.git
 cd Commitify
 
-# Install
-npm install
-
 # Configure
 cp .env.example .env
+# Edit .env with your GitHub OAuth credentials
 ```
 
-Fill in your `.env`:
-
 ```env
-MONGODB_URI=your_mongodb_connection_string
 GITHUB_CLIENT_ID=your_github_oauth_app_id
 GITHUB_CLIENT_SECRET=your_github_oauth_app_secret
-ENCRYPTION_KEY=32_byte_hex_string_for_encryption
-SESSION_SECRET=random_string_for_cookies
+ENCRYPTION_KEY=your_32_byte_hex_key    # openssl rand -hex 32
 ```
 
 ```bash
-# Run
+# Run (MongoDB included & persistent)
+docker compose up -d --build
+```
+
+App runs on `http://localhost` (port 80). MongoDB data persists in a Docker volume.
+
+### Manual Setup
+
+```bash
+npm install
 npm run dev
 ```
+
+Set `MONGODB_URI` in `.env` if not using Docker.
 
 ## Disclaimer
 
