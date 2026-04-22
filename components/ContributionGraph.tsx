@@ -35,13 +35,15 @@ const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const days = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
 export function ContributionGraph({ weeks, interactive = false, selectedDates, onDateClick, onDateHover, year }: ContributionGraphProps) {
+  const displayYear = year || new Date().getFullYear();
   const monthLabels: { month: string; weekIndex: number }[] = [];
   let lastMonth = -1;
 
   weeks.forEach((week, weekIndex) => {
-    const firstDay = week.contributionDays[0];
-    if (firstDay) {
-      const month = new Date(firstDay.date).getMonth();
+    // Find first day that's actually in the target year
+    const firstDayInYear = week.contributionDays.find(d => d.date.startsWith(displayYear.toString()));
+    if (firstDayInYear) {
+      const month = new Date(firstDayInYear.date).getMonth();
       if (month !== lastMonth) {
         monthLabels.push({ month: months[month], weekIndex });
         lastMonth = month;
@@ -90,6 +92,19 @@ export function ContributionGraph({ weeks, interactive = false, selectedDates, o
               {week.contributionDays.map((day) => {
                 const isSelected = selectedDates?.has(day.date);
                 const isFuture = isCurrentYear && day.date > today;
+                const dayYear = parseInt(day.date.split('-')[0]);
+                const isOutsideYear = dayYear !== displayYear;
+
+                // Render invisible placeholder for days outside the year
+                if (isOutsideYear) {
+                  return (
+                    <div
+                      key={day.date}
+                      style={{ width: cellSize, height: cellSize }}
+                      className="opacity-0"
+                    />
+                  );
+                }
 
                 return (
                   <motion.button
