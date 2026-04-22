@@ -1,6 +1,6 @@
 import { MongoClient, Db } from 'mongodb';
 
-const DB_NAME = 'commitify';
+const DB_NAME = 'Commitify';
 
 interface MongoConnection {
   client: MongoClient;
